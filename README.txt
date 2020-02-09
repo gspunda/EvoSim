@@ -26,7 +26,7 @@
 	*Specimen sometimes dissapear and reappear moment later.
 	*It seems like combat logic doesnt always work since specimen count sometimes doesn't decrease. It might indicate that are are errors in "if" logic responsible for combat.
 
-#Lessons for future:
+#Lessons for the future:
 	*Use more OOP. Species class should have subclass for computer and player. It would save alot of copying and pasting the same instructions. The same goes for Board class that should have Tile subclass. Also it would be great to add more methods to classed instead of bloating GameLogic module.
 
 	*The if function has 120 lines which is far too more. Should have been think it through a little more. Another reason to use more classes instead putting everything into gamelogic.
