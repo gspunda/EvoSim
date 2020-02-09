@@ -1,5 +1,10 @@
 #Version: Alpha 0.1
 
+#Requirements:
+	Python 3.7
+	Python library: colorama
+	Linux/MacOS
+
 #Description:
 	EvoSim is a small Python project with a goal to sharpen my programming skills and create fun simulation. It plays in terminal and creates board on which two species (one created by player and 2nd by computer) try to survive by eating food and replicating. When two specimen from different species happen to meet on the same tile, they will fight and only one will survive. Idea of this game came from "Game of Life" by british mathematician John Horton Conway and my fascination with sim-games.
 
