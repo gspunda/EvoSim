@@ -1,0 +1,8 @@
+#!/bin/bash
+#Launcher file. Goes to the directory with modules and activates virtual enviroment.
+
+source venv/bin/activate
+cd Modules
+python3 Main.py
+cd ..
+deactivate

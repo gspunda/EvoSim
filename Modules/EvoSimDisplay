@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+
+import EvoSimBoard
+
+def DisplayBoard(board, board_size):
+	for i in range(board_size):
+		print(board.board[i])
+
+def main(): #Created for test purposes
+	board = Board(5)
+	DisplayBoard()
+
+if __name__ == '__main__':
+	main()
