@@ -21,43 +21,41 @@ import random
 ######################BLOCK OF FUNCTIONS RESPONSIBLE FOR  GAMEPLAY######################
 ########################################################################################
 def Combat(board, speciman, player_specimen, computer_specimen, speciman_type):
-	print(speciman.positionx, speciman.positiony)
-	input("Walka!")
+	input("Fight!")
 	if speciman_type == 2: #Checks if the speciman is a player
 		for i in range(len(computer_specimen) - 1):
 			if (speciman.positionx == computer_specimen[i].positionx and speciman.positiony == computer_specimen[i].positiony): #Finds the specimen occupying the same tile as current speciman.
-				result = random.randint(0,6) #Creates random int to determine the outcome of the fight.
-				list_index = player_specimen.index(speciman) #Gets index of the current species, used later when removing speciman after lost battle.
-				if speciman.strength > computer_specimen[i].strength and result < 6: #If speciman is stronger there are more random numbers in favor of the speciman.
+				if speciman.strength > computer_specimen[i].strength:
 					board.ChangeTileState(computer_specimen[i].positionx, computer_specimen[i].positiony, 2)
 					computer_specimen.pop(i)
-				elif speciman.strength > computer_specimen[i].strength and result == 6: #If the computer is weaker only 6 can help him win the battle.
-					board.ChangeTileState(player_specimen[list_index].positionx, player_specimen[list_index].positiony, 3)
-					player_specimen.pop(list_index)
-				elif speciman.strength < computer_specimen[i].strength and result < 6: #If the player is weaker anything but 6 makes him lose.
-					board.ChangeTileState(player_specimen[list_index].positionx, player_specimen[list_index].positiony, 3)
-					player_specimen.pop(list_index)
-				else: #Else should only represent situation when player is weaker, but draws 6 and wins.
-					board.ChangeTileState(computer_specimen[i].positionx, computer_specimen[i].positiony, 2)
-					computer_specimen.pop(i)
+					return True
+				elif speciman.strength == computer_specimen[i].strength:
+					random_outcome = random.randint(0, 2)
+					if random_outcome == 1:
+						board.ChangeTileState(computer_specimen[i].positionx, computer_specimen[i].positiony, 2)
+						computer_specimen.pop(i)
+						return True
+					else:
+						return False
+				else: 
+					return False
 	elif speciman_type == 3: #Checks if the speciman is a computer, situations below are similiar to the ones above but are for the computer plaer.
 		for i in range(len(player_specimen)):
-			if (speciman.positionx == computer_specimen[i].positionx and speciman.positiony == computer_specimen[i].positiony): #Finds the specimen occupying the same tile as current speciman.
-				result = random.randint(0,6)
-				list_index = computer_specimen.index(speciman)
-				if speciman.strength > player_specimen[i].strength and result < 6:
+			if (speciman.positionx == player_specimen[i].positionx and speciman.positiony == player_specimen[i].positiony): #Finds the specimen occupying the same tile as current speciman.
+				if speciman.strength > player_specimen[i].strength:
 					board.ChangeTileState(player_specimen[i].positionx, player_specimen[i].positiony, 3)
 					player_specimen.pop(i)
-				elif speciman.strength > player_specimen[i].strength and result == 6:
-					board.ChangeTileState(computer_specimen[list_index].positionx, computer_specimen[list_index].positiony, 2)
-					computer_specimen.pop(list_index)
-				elif speciman.strength < player_specimen[i].strength and result < 6:
-					board.ChangeTileState(computer_specimen[list_index].positionx, computer_specimen[list_index].positiony, 2)
-					computer_specimen.pop(list_index)
-				else:
-					board.ChangeTileState(player_specimen[i].positionx, player_specimen[i].positiony, 3)
-					computer_specimen.pop(i)
-	input("Po walce!")
+					return True
+				elif speciman.strength == player_specimen[i].strength:
+					random_outcome = random.randint(0, 2)
+					if random_outcome == 1:
+						board.ChangeTileState(player_specimen[i].positionx, player_specimen[i].positiony, 3)
+						player_specimen.pop(i)
+						return True
+					else:
+						return False
+				else: 
+					return False
 
 def Mutation(new_speciman): #Creates a random mutation in 3 of the main attributes.
 	choose_attr = random.randint(0,3)
@@ -82,35 +80,27 @@ def Replicate(specimen, speciman): #This functions creates the copy of a specima
 		Mutation(new_speciman)
 	specimen.append(new_speciman)
 
-def PostMove(board, player_specimen, computer_specimen, speciman, conflict, fed, speciman_type): #This function deals with outcomes of previous move.
-	if fed == True and speciman_type == 2: 
+def Feed(board, player_specimen, computer_specimen, speciman, speciman_type): #This function deals with outcomes of previous move.
+	speciman.Refill() #Refills turns_left attribute.
+	if speciman_type == 2: 
 		Replicate(player_specimen, speciman)
-		return player_specimen, board 
-	elif fed == True and speciman_type == 3:
+	elif speciman_type == 3:
 		Replicate(computer_specimen, speciman)
-		return computer_specimen, board 
-	elif conflict == True:
-		Combat(board, speciman, player_specimen, computer_specimen, speciman_type)
 
-
-
-
-def MoveSpeciman(board, speciman, speciman_type): #This function is responsible for controlling specimen movement on the board.
-	conflict = False
-	fed = False
-
+def MoveSpeciman(board, player_specimen, computer_specimen, speciman, speciman_type): #This function is responsible for controlling specimen movement on the board.
+	won = True
 	for i in range(speciman.speed):
 		direction = random.choice(['N', 'S', 'W', 'E', 'NW', 'NE', 'SW', 'SE']) #Creates random direction.
 		if (direction == 'N' #This if statement probably should call functions instead doing almost the same thing 8 times, but it looks cool. ;)
 		and speciman.positionx != 0 #Checks if next move won't move out of list boundries.
 		and board.board[speciman.positionx - 1][speciman.positiony] != speciman_type #Checks if tile is occupied by the same species.
 		and [ speciman.prev_positionx, speciman.prev_positiony ] != [(speciman.positionx - 1), speciman.positiony ]): #Checks if drawn tile is not previous tile. (Prevents backtracking)
-			if (speciman_type == 2 and board.board[speciman.positionx - 1][speciman.positiony] == 3 #Checks if choosed tile is occupied by enemy species.
-			or speciman_type == 3 and board.board[speciman.positionx - 1][speciman.positiony] == 2
+			if ((speciman_type == 2 and board.board[speciman.positionx - 1][speciman.positiony] == 3 #Checks if choosed tile is occupied by enemy species.
+			or speciman_type == 3 and board.board[speciman.positionx - 1][speciman.positiony] == 2)
 			and speciman.predator == True):
-				conflict = True #If tile is occupied by enemy species and current moving species is predator it sets the conflict True.
+				 won = Combat(board, speciman, player_specimen, computer_specimen, speciman_type)
 			elif board.board[speciman.positionx - 1][speciman.positiony] == 1:
-				fed = True #Else if choosed tile is just a food tile, it sets fed to True.
+				Feed(board, player_specimen, computer_specimen, speciman, speciman_type)
 			speciman.prev_positionx = speciman.positionx
 			speciman.prev_positiony = speciman.positiony
 			speciman.positionx -= 1
@@ -119,12 +109,12 @@ def MoveSpeciman(board, speciman, speciman_type): #This function is responsible 
 		and speciman.positionx != (board.board_size -1)
 		and board.board[speciman.positionx + 1][speciman.positiony] != speciman_type
 		and [ speciman.prev_positionx, speciman.prev_positiony ] != [(speciman.positionx + 1), speciman.positiony ]):
-			if (speciman_type == 2 and board.board[speciman.positionx + 1][speciman.positiony] == 3
-			or speciman_type == 3 and board.board[speciman.positionx + 1][speciman.positiony] == 2
+			if ((speciman_type == 2 and board.board[speciman.positionx + 1][speciman.positiony] == 3
+			or speciman_type == 3 and board.board[speciman.positionx + 1][speciman.positiony] == 2)
 			and speciman.predator == True):
-				conflict = True
+				 won = Combat(board, speciman, player_specimen, computer_specimen, speciman_type)
 			elif board.board[speciman.positionx + 1][speciman.positiony] == 1:
-				fed = True
+				Feed(board, player_specimen, computer_specimen, speciman, speciman_type)
 			speciman.prev_positionx = speciman.positionx
 			speciman.prev_positiony = speciman.positiony
 			speciman.positionx += 1
@@ -133,12 +123,12 @@ def MoveSpeciman(board, speciman, speciman_type): #This function is responsible 
 		and speciman.positiony != 0
 		and board.board[speciman.positionx][speciman.positiony - 1] != speciman_type
 		and [ speciman.prev_positionx, speciman.prev_positiony ] != [ speciman.positionx, (speciman.positiony - 1) ]):
-			if (speciman_type == 2 and board.board[speciman.positionx][speciman.positiony - 1] == 3
-			or speciman_type == 3 and board.board[speciman.positionx][speciman.positiony - 1] == 2
+			if ((speciman_type == 2 and board.board[speciman.positionx][speciman.positiony - 1] == 3
+			or speciman_type == 3 and board.board[speciman.positionx][speciman.positiony - 1] == 2)
 			and speciman.predator == True):
-				conflict = True
+				 won = Combat(board, speciman, player_specimen, computer_specimen, speciman_type)
 			elif board.board[speciman.positionx][speciman.positiony - 1] == 1:
-				fed = True
+				Feed(board, player_specimen, computer_specimen, speciman, speciman_type)
 			speciman.prev_positionx = speciman.positionx
 			speciman.prev_positiony = speciman.positiony
 			speciman.positiony -= 1
@@ -147,12 +137,12 @@ def MoveSpeciman(board, speciman, speciman_type): #This function is responsible 
 		and speciman.positiony != (board.board_size - 1)
 		and board.board[speciman.positionx][speciman.positiony + 1] != speciman_type
 		and [ speciman.prev_positionx, speciman.prev_positiony ] != [ speciman.positionx, (speciman.positiony + 1) ]):
-			if (speciman_type == 2 and board.board[speciman.positionx][speciman.positiony + 1] == 3
-			or speciman_type == 3 and board.board[speciman.positionx][speciman.positiony + 1] == 2
+			if ((speciman_type == 2 and board.board[speciman.positionx][speciman.positiony + 1] == 3
+			or speciman_type == 3 and board.board[speciman.positionx][speciman.positiony + 1] == 2)
 			and speciman.predator == True):
-				conflict = True
+				 won = Combat(board, speciman, player_specimen, computer_specimen, speciman_type)
 			elif board.board[speciman.positionx][speciman.positiony + 1] == 1:
-				fed = True
+				Feed(board, player_specimen, computer_specimen, speciman, speciman_type)
 			speciman.prev_positionx = speciman.positionx
 			speciman.prev_positiony = speciman.positiony
 			speciman.positiony += 1
@@ -162,12 +152,12 @@ def MoveSpeciman(board, speciman, speciman_type): #This function is responsible 
 		and speciman.positiony != 0
 		and board.board[speciman.positionx - 1][speciman.positiony - 1] != speciman_type
 		and [ speciman.prev_positionx, speciman.prev_positiony ] != [ (speciman.positionx - 1), (speciman.positiony - 1) ]):
-			if (speciman_type == 2 and board.board[speciman.positionx - 1][speciman.positiony - 1] == 3
-			or speciman_type == 3 and board.board[speciman.positionx - 1][speciman.positiony - 1] == 2
+			if ((speciman_type == 2 and board.board[speciman.positionx - 1][speciman.positiony - 1] == 3
+			or speciman_type == 3 and board.board[speciman.positionx - 1][speciman.positiony - 1] == 2)
 			and speciman.predator == True):
-				conflict = True
+				 won = Combat(board, speciman, player_specimen, computer_specimen, speciman_type)
 			elif board.board[speciman.positionx - 1][speciman.positiony - 1] == 1:
-				fed = True
+				Feed(board, player_specimen, computer_specimen, speciman, speciman_type)
 			speciman.prev_positionx = speciman.positionx
 			speciman.prev_positiony = speciman.positiony
 			speciman.positionx -= 1
@@ -178,12 +168,12 @@ def MoveSpeciman(board, speciman, speciman_type): #This function is responsible 
 		and speciman.positiony != (board.board_size - 1)
 		and board.board[speciman.positionx - 1][speciman.positiony + 1] != speciman_type
 		and [ speciman.prev_positionx, speciman.prev_positiony ] != [ (speciman.positionx - 1), (speciman.positiony + 1) ]):
-			if (speciman_type == 2 and board.board[speciman.positionx - 1][speciman.positiony + 1] == 3
-			or speciman_type == 3 and board.board[speciman.positionx - 1][speciman.positiony + 1] == 2
+			if ((speciman_type == 2 and board.board[speciman.positionx - 1][speciman.positiony + 1] == 3
+			or speciman_type == 3 and board.board[speciman.positionx - 1][speciman.positiony + 1] == 2)
 			and speciman.predator == True):
-				conflict = True
+				 won = Combat(board, speciman, player_specimen, computer_specimen, speciman_type)
 			elif board.board[speciman.positionx - 1][speciman.positiony + 1] == 1:
-				fed = True
+				Feed(board, player_specimen, computer_specimen, speciman, speciman_type)
 			speciman.prev_positionx = speciman.positionx
 			speciman.prev_positiony = speciman.positiony
 			speciman.positionx -= 1
@@ -194,12 +184,12 @@ def MoveSpeciman(board, speciman, speciman_type): #This function is responsible 
 		and speciman.positiony != 0
 		and board.board[speciman.positionx + 1][speciman.positiony - 1] != speciman_type
 		and [ speciman.prev_positionx, speciman.prev_positiony ] != [ (speciman.positionx + 1), (speciman.positiony - 1) ]):
-			if (speciman_type == 2 and board.board[speciman.positionx + 1][speciman.positiony - 1] == 3
-			or speciman_type == 3 and board.board[speciman.positionx + 1][speciman.positiony - 1] == 2
+			if ((speciman_type == 2 and board.board[speciman.positionx + 1][speciman.positiony - 1] == 3
+			or speciman_type == 3 and board.board[speciman.positionx + 1][speciman.positiony - 1] == 2)
 			and speciman.predator == True):
-				conflict = True
+				 won = Combat(board, speciman, player_specimen, computer_specimen, speciman_type)
 			elif board.board[speciman.positionx + 1][speciman.positiony - 1] == 1:
-				fed = True
+				Feed(board, player_specimen, computer_specimen, speciman, speciman_type)
 			speciman.prev_positionx = speciman.positionx
 			speciman.prev_positiony = speciman.positiony
 			speciman.positionx += 1
@@ -210,17 +200,28 @@ def MoveSpeciman(board, speciman, speciman_type): #This function is responsible 
 		and speciman.positiony != (board.board_size - 1)
 		and board.board[speciman.positionx + 1][speciman.positiony + 1] != speciman_type
 		and [ speciman.prev_positionx, speciman.prev_positiony ] != [ (speciman.positionx + 1), (speciman.positiony + 1) ]):
-			if (speciman_type == 2 and board.board[speciman.positionx + 1][speciman.positiony + 1] == 3
-			or speciman_type == 3 and board.board[speciman.positionx + 1][speciman.positiony + 1] == 2
+			if ((speciman_type == 2 and board.board[speciman.positionx + 1][speciman.positiony + 1] == 3
+			or speciman_type == 3 and board.board[speciman.positionx + 1][speciman.positiony + 1] == 2)
 			and speciman.predator == True):
-				conflict = True
+				 won = Combat(board, speciman, player_specimen, computer_specimen, speciman_type)
 			elif board.board[speciman.positionx + 1][speciman.positiony + 1] == 1:
-				fed = True
+				Feed(board, player_specimen, computer_specimen, speciman, speciman_type)
 			speciman.prev_positionx = speciman.positionx
 			speciman.prev_positiony = speciman.positiony
 			speciman.positionx += 1
 			speciman.positiony += 1
 			break
+	
+	if won == False and speciman_type == 2:
+		list_index = player_specimen.index(speciman)
+		board.ChangeTileState(speciman.positionx, speciman.positiony, 0)
+		player_specimen.pop(list_index)
+		return
+	elif won == False and speciman_type == 3:
+		list_index = computer_specimen.index(speciman)
+		board.ChangeTileState(speciman.positionx, speciman.positiony, 0)
+		computer_specimen.pop(list_index)
+		return
 
 	if speciman_type == 2:
 		board.ChangeTileState(speciman.positionx, speciman.positiony, 2)
@@ -228,7 +229,6 @@ def MoveSpeciman(board, speciman, speciman_type): #This function is responsible 
 	elif speciman_type == 3:
 		board.ChangeTileState(speciman.positionx, speciman.positiony, 3)
 		board.ChangeTileState(speciman.prev_positionx, speciman.prev_positiony, 0)
-	return conflict, fed
 
 ########################################################################################		
 ######################BLOCK OF FUNCTIONS RESPONSIBLE FOR CREATING SPECIES###############

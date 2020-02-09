@@ -10,7 +10,7 @@ class Species():
 		self.name = name #Quite obvious this one.
 		
 		self.strength = strength #Determines ability to fight. Individual with higher strength has higher change two win in fight occur.
-		self.speed = speed #How many tiles individual moves per turn. If predator is set to false higher speed allows to escape.
+		self.speed = speed #How many tiles individual moves per turn.
 		self.resistance = resistance #Multiplier of extra turns.
 		self.predator = predator #Binary atribute. If enabled individual seeks fight also won't try to escape when attacked. Can feed on fallen enemy.
 		
@@ -19,7 +19,10 @@ class Species():
 		self.prev_positionx = positionx #Individual's previous position on the board. Set the same as position when object is created.
 		self.prev_positiony = positiony
 
-		self.turns_left = 18 + (3 * resistance) #Determines how many turns until speciman dies.
+		self.turns_left = 12 + (3 * resistance) #Determines how many turns until speciman dies.
+
+	def Refill(self): #Refills speciman after eating.
+		self.turns_left = 12 + (3 * self.resistance)
 
 	@staticmethod
 	def ComputerSpeciesNameGen(): #This funtion generates random name for a computer species.

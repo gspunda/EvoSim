@@ -19,24 +19,23 @@ def GameEnd(player_specimen, computer_specimen, turns):
 
 
 def GameTurn(game_board, player_specimen, computer_specimen, turns): #This function procceses single turn of the game.
-	if turns % 32 == 0: #Refills board with food.
+	i = 0
+	if turns % 8 == 0: #Refills board with food.
 		EvoSimBoard.Board.Fill(game_board) #Fills the created board with a food.
 
-	i = 0
 	while True: #This loop continues for as long as there are unmoved specimen.
-		player_turn_ended = False
+		player_turn_ended = False 
 		computer_turn_edned = False
 		if i < len(player_specimen): #Performs moves for player_species as long as there are species in the list.
 			if player_specimen[i].predator == True:
 				player_specimen[i].turns_left -= 2
 			else:
 				player_specimen[i].turns_left -= 1
-			conflict, fed = EvoSimGameLogic.MoveSpeciman(game_board, player_specimen[i], 2)
-			if (conflict == True or fed == True): 
-				EvoSimGameLogic.PostMove(game_board, player_specimen, computer_specimen, player_specimen[i], conflict, fed, 2)
-			elif player_specimen[i].turns_left < 1:
-					game_board.ChangeTileState(player_specimen[i].positionx, player_specimen[i].positiony, 0)
-					player_specimen.pop(i)
+			if player_specimen[i].turns_left < 1:
+				game_board.ChangeTileState(player_specimen[i].positionx, player_specimen[i].positiony, 0)
+				player_specimen.pop(i)
+			else:
+				EvoSimGameLogic.MoveSpeciman(game_board, player_specimen, computer_specimen, player_specimen[i], 2)
 		else:
 			player_turn_ended = True #Variable is set to True when all specimen performed during this turn.
 		if i < len(computer_specimen): #Performs moves for computer_species as long as there are species in the list.
@@ -44,13 +43,11 @@ def GameTurn(game_board, player_specimen, computer_specimen, turns): #This funct
 				computer_specimen[i].turns_left -= 2
 			else:
 				computer_specimen[i].turns_left -= 1
-			conflict, fed = EvoSimGameLogic.MoveSpeciman(game_board, computer_specimen[i], 3)
-			if (conflict == True or fed == True): 
-				EvoSimGameLogic.PostMove(game_board, player_specimen, computer_specimen, computer_specimen[i], conflict, fed, 3)
-			elif computer_specimen[i].turns_left < 1:
+			if computer_specimen[i].turns_left < 1:
 				game_board.ChangeTileState(computer_specimen[i].positionx, computer_specimen[i].positiony, 0)
 				computer_specimen.pop(i)
-
+			else:
+				EvoSimGameLogic.MoveSpeciman(game_board, player_specimen, computer_specimen, computer_specimen[i], 3)
 		else:
 			computer_turn_edned = True  #Variable is set to True when all specimen performed during this turn.
 		if player_turn_ended == True and computer_turn_edned == True: #Once both sides performed actions with all their speciman, turn ends.
