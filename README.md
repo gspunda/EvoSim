@@ -1,18 +1,24 @@
 # Version: Alpha 0.1
 
-## Requirements:
+## Requirements
 
 - Python 3.7
 - Python library: colorama
 - Linux/MacOS
 
-# Description:
+# Description
 
 EvoSim is a small Python project with a goal to sharpen my programming skills and create fun simulation. It plays in terminal and creates board on which two species (one created by player and 2nd by computer) try to survive by eating food and replicating. When two specimen from different species happen to meet on the same tile, they will fight and only one will survive. Idea of this game came from "Game of Life" by british mathematician John Horton Conway and my fascination with sim-games.
 
-# Running the program:
+# Running the program
 
 Linux/MacOS users need to doubleclick Launcher icon or run as a scirpt with "./" commmand. (Might need to set permission with chmod +x Launcher)
+
+## Environment configuration
+
+Create virtual environemtn with `virtualenv .venv`. Active it based on your system. In unix-like system it's `source .venv/activate`. In Windows it's `.venv\Scripts\activate.bat`.
+
+Install requirements with `pip install -r requirements`.
 
 # Future funciotnality:
 
@@ -25,7 +31,7 @@ Linux/MacOS users need to doubleclick Launcher icon or run as a scirpt with "./"
 * Perks - Perks would be fine idea. For example fertility would give a chance for bigger offsptring etc.
 * Escape - Speciman with higher speed and predator attribute set to False will have a chance to escape the predator.
 
-# Knowns bugs:
+# Knowns bugs
 
 * Computer specimen do not show on board sometimes. It looks like logic still works, but they are not displayed on a board
 
@@ -33,7 +39,7 @@ Linux/MacOS users need to doubleclick Launcher icon or run as a scirpt with "./"
 
 * It seems like combat logic doesnt always work since specimen count sometimes doesn't decrease. It might indicate that are are errors in "if" logic responsible for combat.
 
-# Lessons for the future:
+# Lessons for the future
 
 * Use more OOP. Species class should have subclass for computer and player. It would save alot of copying and pasting the same instructions. The same goes for Board class that should have Tile subclass. Also it would be great to add more methods to classed instead of bloating GameLogic module.
 
