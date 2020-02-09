@@ -21,7 +21,7 @@ import random
 ######################BLOCK OF FUNCTIONS RESPONSIBLE FOR  GAMEPLAY######################
 ########################################################################################
 def Combat(board, speciman, player_specimen, computer_specimen, speciman_type):
-	input("Fight!")
+
 	if speciman_type == 2: #Checks if the speciman is a player
 		for i in range(len(computer_specimen) - 1):
 			if (speciman.positionx == computer_specimen[i].positionx and speciman.positiony == computer_specimen[i].positiony): #Finds the specimen occupying the same tile as current speciman.
