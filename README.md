@@ -31,7 +31,7 @@ Install requirements with `pip install -r requirements`.
 * Perks - Perks would be fine idea. For example fertility would give a chance for bigger offsptring etc.
 * Escape - Speciman with higher speed and predator attribute set to False will have a chance to escape the predator.
 
-# Knowns bugs
+# Known bugs
 
 * Computer specimen do not show on board sometimes. It looks like logic still works, but they are not displayed on a board
 
